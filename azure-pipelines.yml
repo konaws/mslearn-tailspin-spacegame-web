@@ -52,6 +52,7 @@ steps:
     arguments: '--no-restore --configuration $(buildConfiguration)'
     publishTestResults: true
     projects: '**/*.Tests.csproj'
+    modifyOutputPath: true
 
 
 - task: DotNetCoreCLI@2
