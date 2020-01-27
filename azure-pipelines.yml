@@ -12,11 +12,6 @@ variables:
   dotnetSdkVersion: '3.1.100'
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
-  inputs:
-    version: '$(dotnetSdkVersion)'
-
 - task: Npm@1
   displayName: 'Run npm install'
   inputs:
@@ -32,11 +27,13 @@ steps:
   displayName: 'Write build info'
   workingDirectory: $(wwwrootDir)
 
-- task: DotNetCoreCLI@2
-  displayName: 'Restore project dependencies'
+- task: DotNetCoreInstaller@0
+  displayName: 'Use .NET Core SDK 2.2.103 For Sonar Cloud'
   inputs:
-    command: 'restore'
-    projects: '**/*.csproj'
+    version: '2.2.103'
+  
+- script: dotnet --list-sdks
+  displayName: 'Check dotnet sdks'
 
 - task: SonarCloudPrepare@1
   displayName: 'Prepare SonarCloud analysis'
@@ -50,6 +47,20 @@ steps:
     extraProperties: |
       sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/Coverage/coverage.opencover.xml
       sonar.exclusions=**/wwwroot/lib/**/*
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+  inputs:
+    version: '$(dotnetSdkVersion)'
+
+- script: dotnet --list-sdks
+  displayName: 'Check dotnet sdks'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore project dependencies'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build the project - $(buildConfiguration)'
